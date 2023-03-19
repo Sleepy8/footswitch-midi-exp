@@ -1,2 +1,2 @@
 # footswitch-midi-exp
-footswitch midi com botoes momentaneos e de trava,  varias funções potenciometro midi e pedal de expressão
+footswitch midi com botoes momentaneos e de trava,  varias funções potenciometro midi e pedal de expressão usando Arduino Pro Micro ( funciona no leonardo sem mudar nada )
