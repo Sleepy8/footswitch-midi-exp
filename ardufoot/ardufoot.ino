@@ -1,152 +1,167 @@
 #include "MIDIUSB.h"
 
-//a
-byte botao = 2;
-byte botaoEstado = 0;
-byte botaoEstadoP = 1;
-byte outputValor = 1;
-byte midiEstado = 0;
-byte midiEstadoP = 0;
-unsigned long tempoPressionado = 0;
-byte led = 6;
-byte outputSegurado = 1;
-byte botaoSegurado = 0;
+const int nBotaoPush = 4; // botao momentaneo
+byte botaoPushPin[nBotaoPush] = { 2,3,4,5};
+byte botaoPushEstado[nBotaoPush] = {0};
+byte botaoPushEstadoP[nBotaoPush] = {0};
+byte botaoPushMidiN[nBotaoPush] = {64,65,66,67};
+byte botaoSegMidiN[nBotaoPush] = {68,69,70,71};
+byte botaoSeg[nBotaoPush] = {0};
+byte outputSeg[nBotaoPush] = {1};
+
+const int nBotaoToggle = 1; //botao com trava 
+byte botaoTogglePin[nBotaoToggle] = {14};
+byte botaoToggleEstado[nBotaoToggle] = {0};
+byte botaoToggleMidiN[nBotaoToggle] = {90};
+byte botaoToggleEstadoP[nBotaoToggle] = {0};
 
 
-byte pot = A1;
-byte mapaPotMidi = 0;
-byte mapaPotMidiP = 0;
-byte potEstado = 0;
-byte potEstadoP = 0;
-unsigned long ultimoPot =  0 ;
-unsigned long potTimer =  0 ;
+
+byte botaoChannel[nBotaoPush] = {5}; //canal midi (0 à 17)
+
+byte outputSegurado[nBotaoPush] = {1};
+byte outputValor[nBotaoPush] = {1};
+byte midiEstado[nBotaoPush] = {0};
+
+byte tempoPressionado[nBotaoPush]={0};
+
+const int nLed = 4; // leds para os botoes momentaneos ( botao com trava pode acender só com o botao...)
+byte ledPin[nLed] = {6,7,8,9};
+
+
 
 
 void setup() {
   // put your setup code here, to run once:
+
 Serial.begin(115200);
 
-pinMode(botao, INPUT_PULLUP);
+  for(int i = 0; i < nBotaoPush; i++){
+    pinMode(botaoPushPin[i], INPUT_PULLUP);
+  };
 
-pinMode(led, OUTPUT);
+  for(int i = 0; i < nBotaoToggle; i++){
+    pinMode(botaoTogglePin[i], INPUT_PULLUP);
+  };
 
-
-  
+for(int i = 0; i < nLed; i++){
+  pinMode(ledPin[i], OUTPUT);
+};
 }
-
-
-
 
 void loop() {
   // put your main code here, to run repeatedly:
-botaoEstado = digitalRead(botao);
+for (int i = 0; i < nBotaoPush; i++){
+botaoPushEstado[i] = digitalRead(botaoPushPin[i]);
 
-if (botaoEstado == 0) {
-    if (botaoEstadoP == 1) {
-      // O botão acabou de ser pressionado
-      tempoPressionado = millis(); // Armazena o tempo atual
+if (botaoPushEstado[i] == 0) {
+    if (botaoPushEstadoP[i] == 1) {
+      tempoPressionado[i] = millis(); // Armazena o tempo atual
     } else {
       // O botão está sendo mantido pressionado
-      if (millis() - tempoPressionado > 1000 ) {
+      if (millis() - tempoPressionado[i] > 1000 ) {
         Serial.println("SEGURADO");
         Serial.println(":outputvalor: ");
-        Serial.print(outputSegurado);
-        outputSegurado++;
+        Serial.print(outputSeg[i]);
+        outputSeg[i]++;
         delay(400);
+        
 
-      }if (outputSegurado > 2) {
-        outputSegurado = 1;
+      }if (outputSeg[i] > 2) {
+        outputSeg[i] = 1;
+        
+        
       }
 
       
     }
   } else {
-    tempoPressionado = 0; // Reinicia o tempo pressionado
+    tempoPressionado[i] = 0; // Reinicia o tempo pressionado
   }
 //Serial.println(botaoSegurado);
   // Atualiza o estado anterior do botão
-  botaoEstadoP = botaoEstado;
+  botaoPushEstadoP[i] = botaoPushEstado[i];
 
-if (botaoEstado == 0) { 
+  if (botaoPushEstado[i] == 0) { 
   delay(300);
-      outputValor++; 
-if (outputValor > 2) { 
-        outputValor = 1;
+      outputValor[i]++; 
+if (outputValor[i] > 2) { 
+        outputValor[i] = 1;
       }
     }
 
 
-  if ((midiEstado == 0)&&(outputValor == 2)) {
-    if (tempoPressionado < 25) {
-    controlChange(5, 64, 127);
+  if ((midiEstado[i] == 0)&&(outputValor[i] == 2)) {
+    if (tempoPressionado[i] < 25 ) {
+    controlChange(botaoChannel, botaoPushMidiN[i], 127); // MANDAR MIDI
      MidiUSB.flush();
 
    Serial.println("midi2");
 
-   digitalWrite(led, LOW);
-    midiEstado++;
+   digitalWrite(ledPin[i], LOW);
+    midiEstado[i]++;
+    
   }
   }
-  if ((midiEstado == 1)&&(outputValor == 1)){
-    if (tempoPressionado < 25) {
-    controlChange(5, 64, 0);
+  if ((midiEstado[i] == 1)&&(outputValor[i] == 1)){
+    if (tempoPressionado[i] < 25) {
+    controlChange(botaoChannel, botaoPushMidiN[i], 0);
     MidiUSB.flush();
 
     Serial.println("midi1");
 
-    digitalWrite(led, HIGH);
-    midiEstado = 0;
+    digitalWrite(ledPin[i], HIGH);
+    midiEstado[i] = 0;
   }
   }
-  if((botaoSegurado == 0) && (outputSegurado == 1)) {
-    controlChange(5, 67, 0);
+
+if((botaoSeg[i] == 0) && (outputSeg[i] == 1)) {
+    controlChange(botaoChannel, botaoSegMidiN[i], 0);
     MidiUSB.flush();
 
     Serial.println("MIDI botaoSegurado1");
-    botaoSegurado++;    
+    botaoSeg[i]++;
+    delay(100);    
   }
-  if((botaoSegurado == 1) && (outputSegurado == 2)) {
-    controlChange(5, 67, 127);
+  if((botaoSeg[i] == 1) && (outputSeg[i] == 2)) {
+    controlChange(botaoChannel, botaoSegMidiN[i], 127);
     MidiUSB.flush();
 
 
     Serial.println("MIDI botaoSegurad2");
-    botaoSegurado = 0;
+    botaoSeg[i] = 0;
+    delay(100); 
   }
 
-  //Serial.println(midiEstado);
 
+}//i botao push
 
-potEstado = analogRead(pot);
+for (int i = 0; i < nBotaoToggle; i++){
+botaoToggleEstado[i] = digitalRead(botaoTogglePin[i]);
 
-mapaPotMidi = map(potEstado, 0, 1023, 0, 127);
-
-int potVar = abs(potEstado - potEstadoP);
-if(potVar > 25 ) {
-  ultimoPot = millis();
-}
-potTimer = millis() - ultimoPot;
-
-if(potTimer < 350) {
-if (mapaPotMidi != mapaPotMidiP) {
-
-controlChange(4, 100, mapaPotMidi);
+if (botaoToggleEstado[i] != botaoToggleEstadoP[i]) {
+if(botaoToggleEstado[i] == 0){
+  controlChange(botaoChannel,botaoToggleMidiN[i], 127);
 MidiUSB.flush();
-
-  Serial.print("pot ");
-  Serial.print(": ");
-
-  Serial.println(mapaPotMidi);
-
-  mapaPotMidiP = mapaPotMidi;
-  potEstadoP = potEstado;
+Serial.println("botao toggle nota on");
+  delay(200);
+} else {
+  controlChange(botaoChannel,botaoToggleMidiN[i], 0);
+MidiUSB.flush();
+Serial.println("botao toggle nota off");
+  delay(200);
 }
 }
-}
+botaoToggleEstadoP[i] = botaoToggleEstado[i];
+};
 
 
 
 
+
+}//loop
+
+//-----------------------------------------------------------------
 
 void controlChange(byte channel, byte control, byte value) {
 
