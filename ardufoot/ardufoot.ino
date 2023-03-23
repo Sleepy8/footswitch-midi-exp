@@ -1,4 +1,7 @@
+#include <Control_Surface.h>
+
 #include "MIDIUSB.h"
+USBMIDI_Interface midi;
 
 const int nBotaoPush = 4; // botao momentaneo
 byte botaoPushPin[nBotaoPush] = { 2,3,4,5};
@@ -15,9 +18,8 @@ byte botaoToggleEstado[nBotaoToggle] = {0};
 byte botaoToggleMidiN[nBotaoToggle] = {90};
 byte botaoToggleEstadoP[nBotaoToggle] = {0};
 
-
-
-byte botaoChannel[nBotaoPush] = {5}; //canal midi (0 à 17)
+byte botaoChannel = {5}; //canal midi (0 à 17)
+byte potChannel = {7}; //canal midi (0 à 17)
 
 byte outputSegurado[nBotaoPush] = {1};
 byte outputValor[nBotaoPush] = {1};
@@ -29,10 +31,19 @@ const int nLed = 4; // leds para os botoes momentaneos ( botao com trava pode ac
 byte ledPin[nLed] = {6,7,8,9};
 
 
-
+CCPotentiometer pot2 {
+   A1, //Pino do Potênciometro 
+  {MIDI_CC::Channel_Volume, CHANNEL_1}, 
+};
+CCPotentiometer pot1 {
+   A0, //Pino do Potênciometro */
+  {MIDI_CC::Channel_Volume, CHANNEL_1}, 
+};
 
 void setup() {
   // put your setup code here, to run once:
+
+  Control_Surface.begin();
 
 Serial.begin(115200);
 
@@ -51,6 +62,9 @@ for(int i = 0; i < nLed; i++){
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+Control_Surface.loop(); 
+
 for (int i = 0; i < nBotaoPush; i++){
 botaoPushEstado[i] = digitalRead(botaoPushPin[i]);
 
@@ -156,10 +170,10 @@ botaoToggleEstadoP[i] = botaoToggleEstado[i];
 };
 
 
+}
 
 
-
-}//loop
+//loop
 
 //-----------------------------------------------------------------
 
