@@ -1,7 +1,7 @@
-#include <Control_Surface.h>
+
 
 #include "MIDIUSB.h"
-USBMIDI_Interface midi;
+
 
 const int nBotaoPush = 4; // botao momentaneo
 byte botaoPushPin[nBotaoPush] = { 2,3,4,5};
@@ -25,25 +25,25 @@ byte outputSegurado[nBotaoPush] = {1};
 byte outputValor[nBotaoPush] = {1};
 byte midiEstado[nBotaoPush] = {0};
 
+
+const int nPots = 2;
+byte potPin[nPots] = {A0, A1};
+int potEstado[nPots] = {0};
+int potMapaMidi[nPots] = {0};
+int potMapaMidiP[nPots] = {0};
+byte potMidiNota[nPots] = {103,105};
+
+
 byte tempoPressionado[nBotaoPush]={0};
 
 const int nLed = 4; // leds para os botoes momentaneos ( botao com trava pode acender só com o botao...)
 byte ledPin[nLed] = {6,7,8,9};
 
 
-CCPotentiometer pot2 {
-   A1, //Pino do Potênciometro 
-  {MIDI_CC::Channel_Volume, CHANNEL_1}, 
-};
-CCPotentiometer pot1 {
-   A0, //Pino do Potênciometro */
-  {MIDI_CC::Channel_Volume, CHANNEL_1}, 
-};
 
 void setup() {
   // put your setup code here, to run once:
 
-  Control_Surface.begin();
 
 Serial.begin(115200);
 
@@ -62,8 +62,21 @@ for(int i = 0; i < nLed; i++){
 
 void loop() {
   // put your main code here, to run repeatedly:
+for(int i= 0; i < nPots; i++) {
+potEstado[i] = analogRead(potPin[i]);
 
-Control_Surface.loop(); 
+potMapaMidi[i] = map(potEstado[i], 0, 1024, 0, 127);
+
+if(potMapaMidi[i] != potMapaMidiP[i]) {
+
+  controlChange(potChannel, potMidiNota[i], potMapaMidi[i]);
+  MidiUSB.flush();
+
+ 
+Serial.println(potMapaMidi[i]);
+}
+potMapaMidiP[i] = potMapaMidi[i];
+}
 
 for (int i = 0; i < nBotaoPush; i++){
 botaoPushEstado[i] = digitalRead(botaoPushPin[i]);
