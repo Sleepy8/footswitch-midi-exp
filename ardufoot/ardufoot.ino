@@ -29,8 +29,12 @@ byte midiEstado[nBotaoPush] = {0};
 const int nPots = 2;
 byte potPin[nPots] = {A0, A1};
 int potEstado[nPots] = {0};
-int potMapaMidi[nPots] = {0};
-int potMapaMidiP[nPots] = {0};
+byte potEstadoP[nPots] = {0};
+byte potMapaMidi[nPots] = {0};
+byte potMapaMidiP[nPots] = {0};
+unsigned long ultimoPot[nPots] = {0};
+unsigned long potTimer[nPots] = {0};
+
 byte potMidiNota[nPots] = {103,105};
 
 
@@ -62,21 +66,8 @@ for(int i = 0; i < nLed; i++){
 
 void loop() {
   // put your main code here, to run repeatedly:
-for(int i= 0; i < nPots; i++) {
-potEstado[i] = analogRead(potPin[i]);
 
-potMapaMidi[i] = map(potEstado[i], 0, 1024, 0, 127);
 
-if(potMapaMidi[i] != potMapaMidiP[i]) {
-
-  controlChange(potChannel, potMidiNota[i], potMapaMidi[i]);
-  MidiUSB.flush();
-
- 
-Serial.println(potMapaMidi[i]);
-}
-potMapaMidiP[i] = potMapaMidi[i];
-}
 
 for (int i = 0; i < nBotaoPush; i++){
 botaoPushEstado[i] = digitalRead(botaoPushPin[i]);
@@ -182,7 +173,30 @@ Serial.println("botao toggle nota off");
 botaoToggleEstadoP[i] = botaoToggleEstado[i];
 };
 
+for(int i= 0; i < nPots; i++) {
+potEstado[i] = analogRead(potPin[i]);
 
+potMapaMidi[i] = map(potEstado[i], 0, 1023, 0, 127);
+
+int potVar = abs(potEstado[i] - potEstadoP[i]);
+if(potVar > 20 ) {
+  ultimoPot[i] = millis();
+}
+potTimer[i] = millis() - ultimoPot[i];
+
+if(potTimer[i] < 300) {
+if(potMapaMidi[i] != potMapaMidiP[i]) {
+
+  controlChange(potChannel, potMidiNota[i], potMapaMidi[i]);
+  MidiUSB.flush();
+
+ 
+Serial.println(potMapaMidi[i]);
+}
+potMapaMidiP[i] = potMapaMidi[i];
+potEstadoP[i] = potEstado[i];
+}
+}
 }
 
 
