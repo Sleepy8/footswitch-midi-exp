@@ -1,3 +1,7 @@
+#include <MIDIUSB.h>
+
+
+ 
 
 const int nBotaoPush = 3;
 byte botaoPushPin[nBotaoPush] = {2,3,4};
@@ -5,10 +9,12 @@ byte botaoPushEstado[nBotaoPush] = {0};
 byte botaoPushEstadoP[nBotaoPush] = {0};
 byte outputValor[nBotaoPush] = {1};
 byte botaoPushVar[nBotaoPush] = {0};
-
+byte notaMidiPushBotao[nBotaoPush] = {64,65,66};
 
 const int nLeds = 3;
 byte ledPin[nLeds] = {6,7,8};
+
+byte channel = 5;
 
 
 const int nPots = 2;
@@ -19,7 +25,7 @@ int mapPotEstado[nPots] = {0};
 int mapPotEstadoP[nPots] = {0};
 unsigned long tempoPerdido[nPots] = {0};
 unsigned long potTimer[nPots] = {0};
-
+byte notaMidiPot[nPots] = {100,101};
 
 void setup() {
   Serial.begin(115200);
@@ -50,10 +56,14 @@ botaoPushEstadoP[i] = botaoPushEstado[i];
 
 if((outputValor[i] == 1) && (botaoPushVar[i] == 0)){
 botaoPushVar[i]++; 
+controlChange(channel, notaMidiPushBotao[i], 127);
+MidiUSB.flush();
 Serial.println("nota ON");
 digitalWrite(ledPin[i], LOW);
 }
 if((outputValor[i] == 2) && (botaoPushVar[i] == 1)){
+  controlChange(channel, notaMidiPushBotao[i], 0);
+MidiUSB.flush();
   Serial.println("nota OFF");
   botaoPushVar[i] = 0;
 digitalWrite(ledPin[i], HIGH);
@@ -75,6 +85,8 @@ potTimer[i] = millis() - tempoPerdido[i];
 
 if(potTimer[i] < 300){
 if(mapPotEstado[i] != mapPotEstadoP[i]){
+  controlChange(channel, notaMidiPot[i], mapPotEstado[i]);
+MidiUSB.flush();
   Serial.println(mapPotEstado[i]);
 }
 potEstadoP[i] = potEstado[i];
@@ -84,4 +96,11 @@ mapPotEstadoP[i] = mapPotEstado[i];
 }
 }
 
+
+void controlChange(byte channel, byte control, byte value) {
+
+  midiEventPacket_t event = {0x0B, 0xB0 | channel, control, value};
+
+  MidiUSB.sendMIDI(event);
+}
 
