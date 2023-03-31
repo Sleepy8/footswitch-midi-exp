@@ -3,4 +3,11 @@
 footswitch midi com botoes momentaneos e de trava,  varias funções, potenciometro midi e pedal de expressão usando Arduino Pro Micro ( funciona no leonardo sem mudar nada )
 <div align="center">
 <img src="https://github.com/Sleepy8/footswitch-midi-exp/blob/main/imagens/diagram.png" width="600px" >
-</div>
+
+</div><br>
+imagens do foot feito com uma caixa de um roteador velho
+<div align="center">
+<img src="https://github.com/Sleepy8/footswitch-midi-exp/blob/main/imagens/foot.jpg" width="600px" >
+
+</div><br>
+
