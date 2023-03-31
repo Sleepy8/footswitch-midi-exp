@@ -7,12 +7,12 @@ footswitch midi com botoes momentaneos e de trava,  varias funções, potenciome
 </div><br>
 <h1>footswitch + pedal de expressão</h1>
 imagens do foot feito com uma caixa de um roteador velho<br>
-<div align="right">
+<div align="center">
 <img src="https://github.com/Sleepy8/footswitch-midi-exp/blob/main/imagens/foot.jpg" width="600px" >
 
 </div>
-<div align="left">
-<img src="https://github.com/Sleepy8/footswitch-midi-exp/blob/main/imagens/expedalfront.jpg" width="600px" >
+<div align="center">
+<img src="https://github.com/Sleepy8/footswitch-midi-exp/blob/main/imagens/pedais.jpg" width="600px" >
 
 </div><br>
 <br>
