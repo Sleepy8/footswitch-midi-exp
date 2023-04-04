@@ -11,6 +11,13 @@ byte outputValor[nBotaoPush] = {1};
 byte botaoPushVar[nBotaoPush] = {0};
 byte notaMidiPushBotao[nBotaoPush] = {64,65,66};
 
+const int nBotaoToggle = 1;
+byte botaoTogglePin[nBotaoToggle] = {14};
+byte botaoToggleEstado[nBotaoToggle] = {0};
+byte botaoToggleEstadoP[nBotaoToggle] = {0};
+byte notaMidiToggleBotao[nBotaoToggle] = {70};
+
+
 const int nLeds = 3;
 byte ledPin[nLeds] = {6,7,8};
 
@@ -33,8 +40,11 @@ void setup() {
   for(int i = 0; i < nBotaoPush; i++){
     pinMode(botaoPushPin[i], INPUT_PULLUP);
 };
+for(int i = 0; i < nBotaoToggle; i++){
+  pinMode(botaoTogglePin[i], INPUT_PULLUP);
+};
 for(int i = 0; i < nLeds; i++){
-    pinMode(ledPin, OUTPUT);
+    pinMode(ledPin[i], OUTPUT);
 };
 }
 
@@ -70,6 +80,27 @@ digitalWrite(ledPin[i], HIGH);
 }
 
  }
+// -------- Botao Toggle--------------------
+ for(int i = 0; i < nBotaoToggle; i++){
+   botaoToggleEstado[i] = digitalRead(botaoTogglePin[i]);
+
+if(botaoToggleEstado[i] != botaoToggleEstadoP[i]){
+  if(botaoToggleEstado[i] == 0){
+    Serial.println("botao togglen on");
+controlChange(channel, notaMidiToggleBotao[i], 127);
+MidiUSB.flush();
+ delay(50);
+}
+if(botaoToggleEstado[i] == 1){
+  Serial.println("botao togglen off");
+controlChange(channel, notaMidiToggleBotao[i], 0);
+MidiUSB.flush();
+delay(50);
+};
+ botaoToggleEstadoP[i] = botaoToggleEstado[i];
+ }
+ };
+
 //------------------POTS POTS POTS-----------------
 
 for(int i = 0; i < nPots; i++){
