@@ -4,7 +4,8 @@ footswitch midi com botoes momentaneos e de trava,  varias funções, potenciome
 <div align="center">
 <img src="https://github.com/Sleepy8/footswitch-midi-exp/blob/main/imagens/diagram.png" width="600px" >
 <br>
-
+</div><br>
+<div align="center">
 <h1>diagrama pedal de expressão</h1>
 <img src="https://github.com/Sleepy8/footswitch-midi-exp/blob/main/imagens/diagramaexp.jpg" width="600px" ><br>
 (usei a carcaça de um pedal de wah chines e so fiz a ligação como no diagrama acima)
