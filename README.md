@@ -1,6 +1,7 @@
 # footswitch-midi-exp
 <h1> pedaleira/footswitch controlador midi com pedal de expressão usando arduino</h1>
-footswitch midi com botoes momentaneos e de trava, com potenciometro midi e entrada para Pedal de expressao e 1 botao toggle usando Arduino Pro Micro ( funciona no leonardo sem mudar nada )
+footswitch midi com botoes momentaneos e de trava, com potenciometro midi e entrada para Pedal de expressao e 1 botao toggle usando Arduino Pro Micro ( funciona no leonardo sem mudar nada ).
+Estou usando para tocar ao vivo, está ótimo.
 <h2> funções dos botoes: </h2><br>
 -pressiona 1 vez manda cc ON<br>
 -pressiona outra vez manda CC off ( bom para ligar/desligar pedais vst)<br>
